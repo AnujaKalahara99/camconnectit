@@ -9,6 +9,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
+  // Enable HTTPS in development
+  server: {
+    https: true,
+  },
+};
 
-export default nextConfig
+export default nextConfig;
