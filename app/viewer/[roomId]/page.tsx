@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import io from "socket.io-client";
 
-export default function ViewerPage () {
+export default function ViewerPage() {
   const params = useParams();
   const videoRef = useRef<HTMLVideoElement>(null);
   const pcRef = useRef<RTCPeerConnection>(null);
@@ -14,15 +14,25 @@ export default function ViewerPage () {
   useEffect(() => {
     if (!roomId) return;
 
-    const socket = io("https://192.168.1.5:3001", {secure: true});
+    const socket = io("https://192.168.1.5:3001", { secure: true });
     socketRef.current = socket;
 
     const pc = new RTCPeerConnection({
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" }
-      ]
-    });    
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    });
     pcRef.current = pc;
+
+    pc.ondatachannel = (event) => {
+      const receiveChannel = event.channel;
+
+      receiveChannel.onmessage = (event) => {
+        const blob = new Blob([event.data], { type: "image/jpeg" });
+        const url = URL.createObjectURL(blob);
+        const img = document.createElement("img");
+        img.src = url;
+        document.getElementById("photo-container")?.appendChild(img);
+      };
+    };
 
     socket.emit("join", roomId);
 
@@ -58,6 +68,7 @@ export default function ViewerPage () {
     <div>
       <h1>Viewer Page</h1>
       <video ref={videoRef} autoPlay playsInline muted />
+      <div id="photo-container" />
     </div>
   );
-};
+}
