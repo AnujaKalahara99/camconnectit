@@ -55,6 +55,8 @@ const CameraPage = () => {
     };
 
     // Handle socket events
+    socket.emit("waiting", roomId);
+
     socket.emit("join", roomId);
 
     socket.on("peer-joined", async () => {

@@ -11,10 +11,12 @@ export default function ViewerPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const pcRef = useRef<RTCPeerConnection>(null);
   const socketRef = useRef<any>(null);
+  const initializedRef = useRef(false);
   const fileTransfer = new FileTransferManager();
 
   useEffect(() => {
-    if (!roomId) return;
+    if (!roomId || initializedRef.current) return;
+    initializedRef.current = true;
 
     const socket = io("https://192.168.1.5:3001", { secure: true });
     socketRef.current = socket;
@@ -24,6 +26,15 @@ export default function ViewerPage() {
     });
     pcRef.current = pc;
 
+    // 🟢 Attach ontrack handler early
+    pc.ontrack = (event) => {
+      console.log("Received remote track", event.streams);
+      if (videoRef.current) {
+        videoRef.current.srcObject = event.streams[0];
+      }
+    };
+
+    // Attach ondatachannel
     pc.ondatachannel = (event) => {
       const receiveChannel = event.channel;
       fileTransfer.setDataChannel(
@@ -40,18 +51,14 @@ export default function ViewerPage() {
           console.log(`Progress: ${progress.toFixed(1)}%`);
         }
       );
-      // receiveChannel.onmessage = (event) => {
-      //   const blob = new Blob([event.data], { type: "image/jpeg" });
-      //   const url = URL.createObjectURL(blob);
-      //   const img = document.createElement("img");
-      //   img.src = url;
-      //   document.getElementById("photo-container")?.appendChild(img);
-      // };
     };
 
+    console.log("JOOOIIIINN VIEWER");
     socket.emit("join", roomId);
 
+    // Handle offer after setting ontrack
     socket.on("offer", async (offer) => {
+      console.log("Received offer", offer);
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
@@ -65,12 +72,6 @@ export default function ViewerPage() {
         console.error("Error adding received ICE candidate", e);
       }
     });
-
-    pc.ontrack = (event) => {
-      if (videoRef.current) {
-        videoRef.current.srcObject = event.streams[0];
-      }
-    };
 
     pc.onicecandidate = (event) => {
       if (event.candidate) {

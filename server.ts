@@ -1,23 +1,29 @@
 //Signaling Server (Node.js)
 
-import  https  from "https";
+import https from "https";
 import { Server } from "socket.io";
 import fs from "fs";
 
 const options = {
-    key: fs.readFileSync('./certificates/192.168.1.5-key.pem'),
-    cert: fs.readFileSync('./certificates/192.168.1.5.pem'),
-  };
+  key: fs.readFileSync("./certificates/192.168.1.5-key.pem"),
+  cert: fs.readFileSync("./certificates/192.168.1.5.pem"),
+};
 
 const httpsServer = https.createServer(options);
 const io = new Server(httpsServer, {
   cors: {
     origin: "*",
-  }
+  },
 });
 
 io.on("connection", (socket) => {
   console.log(`New connection: ${socket.id}`);
+
+  socket.on("waiting", (roomId) => {
+    socket.join("waiting-room");
+    console.log(`Socket ${socket.id} waiting in room: ${roomId}`);
+    socket.to("waiting-room").emit("waiting-joined", roomId);
+  });
 
   socket.on("join", (roomId) => {
     console.log(`Socket ${socket.id} joining room: ${roomId}`);
@@ -45,6 +51,6 @@ io.on("connection", (socket) => {
   });
 });
 
-httpsServer.listen(3001, '0.0.0.0', () => {
+httpsServer.listen(3001, "0.0.0.0", () => {
   console.log("Signaling server running on https://localhost:3001");
 });

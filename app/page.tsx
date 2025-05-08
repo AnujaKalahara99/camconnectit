@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import { ArrowRight, Camera, Laptop, Smartphone, Wifi } from "lucide-react";
 import Background from "./components/background";
+import QR from "./components/qr";
 
 export default function HomePage() {
   return (
@@ -81,6 +82,74 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="mb-20 w-full flex items-center justify-center">
+          <div className="rounded-2xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-8 shadow-xl shadow-slate-100 dark:shadow-slate-900/10 border border-slate-100 dark:border-slate-800">
+            <div className="grid gap-8 md:grid-cols-2">
+              <div className="flex flex-col justify-center">
+                <h2 className="mb-4 text-3xl font-bold bg-gradient-to-r from-slate-700 to-indigo-600 bg-clip-text text-transparent">
+                  How It Works
+                </h2>
+                <ol className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-slate-700 to-indigo-600 text-sm font-medium text-white">
+                      1
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300">
+                      Make sure your phone and laptop are connected to the same
+                      WiFi
+                    </p>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-slate-700 to-indigo-600 text-sm font-medium text-white">
+                      2
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300">
+                      Scan the QR code on your laptop screen with your phone
+                    </p>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-slate-700 to-indigo-600 text-sm font-medium text-white">
+                      3
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300">
+                      Allow camera access on your phone
+                    </p>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-slate-700 to-indigo-600 text-sm font-medium text-white">
+                      4
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300">
+                      Take photos send files using the web interface
+                    </p>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-slate-700 to-indigo-600 text-sm font-medium text-white">
+                      5
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300">
+                      Media appears instantly on your laptop
+                    </p>
+                  </li>
+                </ol>
+              </div>
+              <div className="flex items-center justify-center p-10">
+                <div className="relative h-64 w-64 overflow-visible rounded-xl bg-gradient-to-br from-slate-100 to-indigo-100 dark:from-slate-800/50 dark:to-indigo-900/30 p-1">
+                  <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800">
+                    <QR />
+
+                    {/* <img
+                      src="/placeholder.svg?height=256&width=256"
+                      alt="QR code scanning demonstration"
+                      className="h-full w-full object-cover"
+                    /> */}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="mb-20">
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             <Card className="overflow-hidden border-0 shadow-lg shadow-slate-100 dark:shadow-slate-900/10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
@@ -134,63 +203,6 @@ export default function HomePage() {
                 </CardDescription>
               </CardContent>
             </Card>
-          </div>
-        </section>
-
-        <section className="mb-20">
-          <div className="rounded-2xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-8 shadow-xl shadow-slate-100 dark:shadow-slate-900/10 border border-slate-100 dark:border-slate-800">
-            <div className="grid gap-8 md:grid-cols-2">
-              <div className="flex flex-col justify-center">
-                <h2 className="mb-4 text-3xl font-bold bg-gradient-to-r from-slate-700 to-indigo-600 bg-clip-text text-transparent">
-                  How It Works
-                </h2>
-                <ol className="space-y-4">
-                  <li className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-slate-700 to-indigo-600 text-sm font-medium text-white">
-                      1
-                    </div>
-                    <p className="text-gray-700 dark:text-gray-300">
-                      Scan the QR code on your laptop screen with your phone
-                    </p>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-slate-700 to-indigo-600 text-sm font-medium text-white">
-                      2
-                    </div>
-                    <p className="text-gray-700 dark:text-gray-300">
-                      Allow camera access on your phone
-                    </p>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-slate-700 to-indigo-600 text-sm font-medium text-white">
-                      3
-                    </div>
-                    <p className="text-gray-700 dark:text-gray-300">
-                      Take photos or videos using the web interface
-                    </p>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-slate-700 to-indigo-600 text-sm font-medium text-white">
-                      4
-                    </div>
-                    <p className="text-gray-700 dark:text-gray-300">
-                      Media appears instantly on your laptop
-                    </p>
-                  </li>
-                </ol>
-              </div>
-              <div className="flex items-center justify-center">
-                <div className="relative h-64 w-64 overflow-hidden rounded-xl bg-gradient-to-br from-slate-100 to-indigo-100 dark:from-slate-800/50 dark:to-indigo-900/30 p-1">
-                  <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-white dark:bg-gray-800">
-                    <img
-                      src="/placeholder.svg?height=256&width=256"
-                      alt="QR code scanning demonstration"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
 
