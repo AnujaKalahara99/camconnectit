@@ -3,13 +3,15 @@
 import { useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import io from "socket.io-client";
+import { FileTransferManager } from "@/lib/fileTransferManager";
 
 export default function ViewerPage() {
   const params = useParams();
+  const { roomId } = params as { roomId: string };
   const videoRef = useRef<HTMLVideoElement>(null);
   const pcRef = useRef<RTCPeerConnection>(null);
   const socketRef = useRef<any>(null);
-  const { roomId } = params as { roomId: string };
+  const fileTransfer = new FileTransferManager();
 
   useEffect(() => {
     if (!roomId) return;
@@ -24,14 +26,27 @@ export default function ViewerPage() {
 
     pc.ondatachannel = (event) => {
       const receiveChannel = event.channel;
-
-      receiveChannel.onmessage = (event) => {
-        const blob = new Blob([event.data], { type: "image/jpeg" });
-        const url = URL.createObjectURL(blob);
-        const img = document.createElement("img");
-        img.src = url;
-        document.getElementById("photo-container")?.appendChild(img);
-      };
+      fileTransfer.setDataChannel(
+        receiveChannel,
+        (file) => {
+          const url = URL.createObjectURL(file);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = file.name;
+          link.textContent = `Download ${file.name}`;
+          document.body.appendChild(link);
+        },
+        (progress) => {
+          console.log(`Progress: ${progress.toFixed(1)}%`);
+        }
+      );
+      // receiveChannel.onmessage = (event) => {
+      //   const blob = new Blob([event.data], { type: "image/jpeg" });
+      //   const url = URL.createObjectURL(blob);
+      //   const img = document.createElement("img");
+      //   img.src = url;
+      //   document.getElementById("photo-container")?.appendChild(img);
+      // };
     };
 
     socket.emit("join", roomId);
