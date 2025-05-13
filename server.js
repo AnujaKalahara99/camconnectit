@@ -5,8 +5,8 @@ import { Server } from "socket.io";
 import fs from "fs";
 
 const options = {
-  key: fs.readFileSync("./certificates/192.168.1.5-key.pem"),
-  cert: fs.readFileSync("./certificates/192.168.1.5.pem"),
+  // key: fs.readFileSync("./certificates/192.168.1.5-key.pem"),
+  // cert: fs.readFileSync("./certificates/192.168.1.5.pem"),
 };
 
 const httpsServer = https.createServer(options);
