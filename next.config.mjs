@@ -11,9 +11,9 @@ const nextConfig = {
     unoptimized: true,
   },
   // Enable HTTPS in development
-  server: {
-    https: true,
-  },
+  // server: {
+  //   https: true,
+  // },
 };
 
 export default nextConfig;
