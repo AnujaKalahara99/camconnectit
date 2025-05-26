@@ -13,7 +13,7 @@ const QRCodeComponent: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const socket = io("https://192.168.1.5:3001", { secure: true });
+    const socket = io("https://camconnectit-production.up.railway.app/", { secure: true });
 
     socket.on("connect", () => {
       console.log("Socket connected", socket.id);

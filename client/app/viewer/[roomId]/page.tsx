@@ -20,7 +20,7 @@ export default function ViewerPage() {
   useEffect(() => {
     if (!roomId) return;
 
-    const socket = io("https://192.168.1.5:3001", { secure: true });
+    const socket = io("https://camconnectit-production.up.railway.app/", { secure: true });
     socketRef.current = socket;
 
     // Function to create or reset peer connection
