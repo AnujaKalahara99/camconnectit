@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 const QRCodeComponent: React.FC = () => {
   const roomId = "123"; // Replace with your actual room ID
-  const qrUrl = `https://192.168.1.5:3000/camera/${roomId}`;
+  const qrUrl = `https://camconnectit.vercel.app/camera/${roomId}`;
 
   const router = useRouter();
 
