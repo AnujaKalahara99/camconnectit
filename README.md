@@ -41,3 +41,14 @@ Idealy first few days to analyze the project and design it. After that developme
 The project should follow Agile methodology where each iteration builds a *simple complete loveable* (SLC) product.
 
  <img src=https://www.altexsoft.com/static/content-image/2024/7/18a5f77a-ffd1-4111-bd7a-51b26faa2808.webp />
+
+
+## Deployment (Test)
+
+> Currently it is hosted for development
+
+[Frontend](https://camconnectit.vercel.app) 
+
+[Frontend - Vercel](https://vercel.com/anujakalahara99s-projects/camconnectit)
+
+[Backend - Railway](https://railway.com/project/95cd6a13-d4c7-4ad1-ae13-db191a8e9a05/service/bcaac188-8463-412c-a387-f6fd445fd224?environmentId=d8cdcf7c-42b0-4123-97eb-d9218cb9cf42)
