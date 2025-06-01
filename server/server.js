@@ -25,7 +25,7 @@ const io = new Server(server, {
 });
 
 // Track room state
-const rooms = new Map(); // roomId -> {camera: socketId, viewer: socketId}
+const rooms = new Map(); // roomId -> {camera: socketId, viewer: socketId, homePage: socketId}
 
 io.on("connection", (socket) => {
   console.log(`New connection: ${socket.id}`);
@@ -33,7 +33,7 @@ io.on("connection", (socket) => {
   let currentRoom = null;
   let userRole = null;
 
-  // Register as camera or viewer in a room
+  // Register as camera, viewer, or home page in a room
   socket.on("register", (roomId, role) => {
     console.log(`Socket ${socket.id} registering as ${role} in room: ${roomId}`);
     
@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
     
     // Initialize room if it doesn't exist
     if (!rooms.has(roomId)) {
-      rooms.set(roomId, { camera: null, viewer: null });
+      rooms.set(roomId, { camera: null, viewer: null, homePage: null });
     }
     
     const roomData = rooms.get(roomId);
@@ -51,17 +51,53 @@ io.on("connection", (socket) => {
     // Update role in room
     if (role === "camera") {
       roomData.camera = socket.id;
+      
+      // If there's a home page waiting, tell it to route to viewer
+      if (roomData.homePage) {
+        io.to(roomData.homePage).emit("route-to-viewer", { roomId });
+        console.log(`Telling home page to route to viewer for room: ${roomId}`);
+      }
+      
     } else if (role === "viewer") {
       roomData.viewer = socket.id;
+    } else if (role === "homePage") {
+      roomData.homePage = socket.id;
+      
+      // If camera is already connected, immediately route to viewer
+      if (roomData.camera) {
+        socket.emit("route-to-viewer", { roomId });
+        console.log(`Camera already connected, routing home page to viewer for room: ${roomId}`);
+      }
     }
     
-    // Notify peers about new connection
+    // Notify peers about new connection (existing logic)
     if (role === "camera" && roomData.viewer) {
       socket.to(roomId).emit("peer-joined", { peerId: socket.id, role });
       socket.emit("peer-joined", { peerId: roomData.viewer, role: "viewer" });
     } else if (role === "viewer" && roomData.camera) {
       socket.to(roomId).emit("peer-joined", { peerId: socket.id, role });
       socket.emit("peer-joined", { peerId: roomData.camera, role: "camera" });
+    }
+  });
+
+  // Handle home page transitioning to viewer
+  socket.on("transition-to-viewer", (roomId) => {
+    console.log(`Socket ${socket.id} transitioning from home to viewer in room: ${roomId}`);
+    
+    if (currentRoom === roomId && userRole === "homePage") {
+      const roomData = rooms.get(roomId);
+      if (roomData) {
+        // Remove from home page role and set as viewer
+        roomData.homePage = null;
+        roomData.viewer = socket.id;
+        userRole = "viewer";
+        
+        // Notify camera if it exists
+        if (roomData.camera) {
+          socket.emit("peer-joined", { peerId: roomData.camera, role: "camera" });
+          io.to(roomData.camera).emit("peer-joined", { peerId: socket.id, role: "viewer" });
+        }
+      }
     }
   });
 
@@ -72,7 +108,6 @@ io.on("connection", (socket) => {
 
   socket.on("answer", (roomId, answer, targetId) => {
     console.log(`Socket ${socket.id} sending answer to ${targetId} in room: ${roomId}`);
-    // Send to specific target if provided, otherwise to the room
     if (targetId) {
       io.to(targetId).emit("answer", answer, socket.id);
     } else {
@@ -82,7 +117,6 @@ io.on("connection", (socket) => {
 
   socket.on("ice-candidate", (roomId, candidate, targetId) => {
     console.log(`Socket ${socket.id} sending ICE candidate to room: ${roomId}`);
-    // Send to specific target if provided, otherwise to the room
     if (targetId) {
       io.to(targetId).emit("ice-candidate", candidate, socket.id);
     } else {
@@ -109,23 +143,23 @@ io.on("connection", (socket) => {
     if (currentRoom && rooms.has(currentRoom)) {
       const roomData = rooms.get(currentRoom);
       
-      // Update room data
+      // Update room data based on role
       if (userRole === "camera" && roomData.camera === socket.id) {
         roomData.camera = null;
-        // Notify viewer that camera disconnected
         if (roomData.viewer) {
           io.to(roomData.viewer).emit("peer-disconnected", { role: "camera" });
         }
       } else if (userRole === "viewer" && roomData.viewer === socket.id) {
         roomData.viewer = null;
-        // Notify camera that viewer disconnected
         if (roomData.camera) {
           io.to(roomData.camera).emit("peer-disconnected", { role: "viewer" });
         }
+      } else if (userRole === "homePage" && roomData.homePage === socket.id) {
+        roomData.homePage = null;
       }
       
       // Clean up empty rooms
-      if (!roomData.camera && !roomData.viewer) {
+      if (!roomData.camera && !roomData.viewer && !roomData.homePage) {
         rooms.delete(currentRoom);
         console.log(`Room ${currentRoom} deleted - no participants left`);
       }

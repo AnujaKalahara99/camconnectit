@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const QRCodeComponent: React.FC = () => {
-  const roomId = "123"; // Replace with your actual room ID
+  const roomId = React.useMemo(() => crypto.randomUUID(), []);
   const qrUrl = `https://camconnectit.vercel.app/camera/${roomId}`;
 
   const router = useRouter();
@@ -17,21 +17,23 @@ const QRCodeComponent: React.FC = () => {
 
     socket.on("connect", () => {
       console.log("Socket connected", socket.id);
+      socket.emit("register", roomId, "homePage");
     });
 
-    socket.emit("waiting", roomId);
-
-    socket.on("waiting-joined", (camRoomId: string) => {
-      console.log("Socket join event received", camRoomId);
-
-      if (camRoomId !== roomId) return;
-      router.push(`/viewer/${roomId}`);
+    socket.on("route-to-viewer", (data) => {
+      console.log("Camera connected! Routing to viewer page...");
+      socket.emit("transition-to-viewer", roomId);
+      routeToViewer(data.roomId);
     });
 
     return () => {
       socket.disconnect();
     };
   }, []);
+
+  const routeToViewer = (roomId: string) => {
+   router.push(`/viewer/${roomId}`);
+  }
 
   return (
     <div style={{ textAlign: "center", marginTop: "2rem" }}>
